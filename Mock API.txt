@@ -1,0 +1,175 @@
+1️Hotel Search – Mock API
+Endpoint
+POST /api/hotel/search
+
+Request
+
+
+Mock Search Response (Success)
+{
+  "arrivalDate": "11/07/2025",
+  "departureDate": "15/07/2025",
+  "currency": "INR",
+  "guestNationality": "IN",
+  "searchSessionId": "46LXWXfSP53FSv3_Vbm1UhmBqIRQT-y0cLP3ECyTVrM",
+  "hotels": [
+    {
+      "id": 721069,
+      "name": "Gizemli Konak",
+      "rating": "3",
+      "price": 5865.11,
+      "hotelWiseRoomCount": 3,
+      "roomDetails": {
+        "roomDetail": [
+          {
+            "type": "Double Room",
+            "bookingKey": "_84PEw42-PVSvOrHfJqECQ",
+            "adults": "2",
+            "children": "0",
+            "totalRooms": 1,
+            "totalRate": "5865.11",
+            "roomDescription": "Breakfast",
+            "cancellationPolicy": {
+              "refundable": "Yes",
+              "tillDate": "06/07/2025"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "error": null
+}
+
+2️Pre-Book (Price & Availability Re-check)
+Endpoint
+POST /api/hotel/prebook
+
+Purpose (BA View)
+
+Revalidate price
+
+Reconfirm availability
+
+Lock bookingKey
+
+Return final payable amount
+
+Mock Prebook Response (Success)
+{
+  "status": "SUCCESS",
+  "searchSessionId": "7wbe_NK6i02fQUVuRE6RmGP2HPQsvir57TUWOVeEYFg",
+  "hotelId": 132056,
+  "price": {
+    "currency": "INR",
+    "baseFare": 1000.00,
+    "taxes": 53.40,
+    "totalAmount": 1053.40
+  },
+  "room": {
+    "bookingKey": "LbLeynQYSZQHlLBYX92a9w",
+    "type": "DOUBLE Accessible Two Double beds",
+    "totalRooms": 1
+  },
+  "cancellationPolicy": {
+    "refundable": true,
+    "freeCancellationTill": "01/07/2025 23:59 IST"
+  },
+  "remarks": "Price confirmed. Proceed to booking.",
+  "error": null
+}
+
+Mock Prebook Failure (Price Changed)
+{
+  "status": "FAILED",
+  "error": {
+    "code": "PRICE_CHANGED",
+    "message": "Hotel price has changed. Please re-search."
+  }
+}
+
+3️Booking (Confirm Reservation)
+Endpoint
+POST /api/hotel/book
+
+Purpose
+
+Create confirmed booking
+
+Generate Booking ID / Booking Code
+
+Lock inventory
+
+Mock Booking Response (Success)
+{
+  "status": "CONFIRMED",
+  "bookingId": "DA8609",
+  "bookingCode": "REZFBAEFA5B",
+  "agentRefNo": "ref123",
+  "hotel": {
+    "hotelId": 132056,
+    "name": "Park Hyatt Washington",
+    "city": 944,
+    "countryCode": "US"
+  },
+  "stayDetails": {
+    "arrivalDate": "11/07/2025",
+    "departureDate": "15/07/2025",
+    "rooms": 1,
+    "guests": 2
+  },
+  "price": {
+    "currency": "INR",
+    "totalAmount": 1053.40
+  },
+  "cancellationPolicy": "No charges if cancelled before 01 Jul 2025 23:59 IST",
+  "bookingStatus": "CONFIRMED",
+  "voucherAvailable": true,
+  "error": null
+}
+
+Mock Booking Failure (Room Sold Out)
+{
+  "status": "FAILED",
+  "error": {
+    "code": "ROOM_NOT_AVAILABLE",
+    "message": "Selected room is no longer available."
+  }
+}
+
+4️Cancellation
+Endpoint
+POST /api/hotel/cancel
+
+Headers
+x-api-key: XXXXX
+
+Mock Cancellation Response (Success – Free Cancellation)
+{
+  "status": "CANCELLED",
+  "bookingId": "DA8609",
+  "bookingCode": "REZFBAEFA5B",
+  "refund": {
+    "currency": "INR",
+    "refundAmount": 1053.40,
+    "refundStatus": "INITIATED"
+  },
+  "cancellationCharges": 0,
+  "remarks": "Booking cancelled successfully.",
+  "error": null
+}
+
+Mock Cancellation Response (With Charges)
+{
+  "status": "CANCELLED",
+  "bookingId": "DA8609",
+  "bookingCode": "REZFBAEFA5B",
+  "refund": {
+    "currency": "INR",
+    "refundAmount": 0,
+    "refundStatus": "NOT_APPLICABLE"
+  },
+  "cancellationCharges": 1053.40,
+  "remarks": "Non-refundable booking.",
+  "error": null
+}
